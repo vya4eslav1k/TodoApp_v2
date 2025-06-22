@@ -6,8 +6,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import ru.todo.spring.javadaddy.todoApp.dto.request.AuthRequestDto;
+import ru.todo.spring.javadaddy.todoApp.dto.response.AuthResponseDto;
 
 
 import javax.crypto.SecretKey;
@@ -15,6 +21,15 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
+
+    private final AuthenticationManager authManager;
+    private final UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtUtil(AuthenticationManager authManager, UserDetailsService userDetailsService) {
+        this.authManager = authManager;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Value("${app.jwt.secret}")
     private String jwtSecret;
@@ -54,5 +69,14 @@ public class JwtUtil {
         } catch (JwtException e) {
             return false;
         }
+    }
+
+    public AuthResponseDto authenticateUser(AuthRequestDto authRequestDto) {
+        UsernamePasswordAuthenticationToken authInputToken =
+                new UsernamePasswordAuthenticationToken(authRequestDto.getLogin(), authRequestDto.getPassword());
+        authManager.authenticate(authInputToken);
+        UserDetails user = userDetailsService.loadUserByUsername(authRequestDto.getLogin());
+        String token = generateToken(user.getUsername());
+        return new AuthResponseDto(authRequestDto.getLogin(), token);
     }
 }
