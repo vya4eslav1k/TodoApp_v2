@@ -1,7 +1,10 @@
 package ru.todo.spring.javadaddy.todoApp.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.todo.spring.javadaddy.todoApp.enums.TaskStatus;
 
 import java.time.LocalDate;
@@ -9,9 +12,13 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "task")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Task {
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name = "title", length = 50)
     private String title;

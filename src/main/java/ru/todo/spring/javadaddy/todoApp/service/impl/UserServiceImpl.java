@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public AuthResponseDto createAndLoginUser(UserRequestDto userRequestDto) {
-        User user = createUser(userRequestDto);
+        createUser(userRequestDto);
         return jwtUtil.authenticateUser(new AuthRequestDto(userRequestDto.getLogin(), userRequestDto.getPassword()));
     }
 
