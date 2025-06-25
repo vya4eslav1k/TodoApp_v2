@@ -1,5 +1,8 @@
 package ru.todo.spring.javadaddy.todoApp.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,8 +23,32 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(
+            summary = "Register a new user",
+            description = "Creates a new user account and returns a JWT token upon successful registration"
+    )
     @PostMapping
-    public AuthResponseDto createUser(@RequestBody UserRequestDto userRequestDto) {
+    public AuthResponseDto createUser(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "New user registration data",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Registration request example",
+                                    value = """
+                    {
+                      "login": "johndoe",
+                      "password": "mysecret",
+                      "email": "johndoe@example.com",
+                      "bio": "Just a regular user"
+                    }
+                    """
+                            )
+                    )
+            )
+            @RequestBody UserRequestDto userRequestDto
+    ) {
         return userService.createAndLoginUser(userRequestDto);
     }
 }
