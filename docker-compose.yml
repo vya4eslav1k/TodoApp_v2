@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: todo_postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: todo_app_user
+      POSTGRES_PASSWORD: todo_app_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: todo_app
+    depends_on:
+      - db
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      spring.datasource.url: jdbc:postgresql://db:5432/postgres?currentSchema=todo_app
+      spring.datasource.username: todo_app_user
+      spring.datasource.password: todo_app_password
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
